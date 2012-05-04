@@ -1,9 +1,7 @@
 "=============================================================================
 " File: evervim.vim
 " Author: kakkyz <kakkyz81@gmail.com>
-" Last Change: 2011-05-05
-" Version: 0.1
-" WebPage: httpevervim#//github.com/kakkyz81/evervim
+" WebPage: http://kakkyz81.github.com/evervim/
 " License: MIT
 "
 "scriptencoding utf-8
@@ -52,7 +50,8 @@ function! evervim#notesByNotebook() " {{{
     setlocal modifiable
     python Evervimmer.getInstance().notesByNotebook()
     setlocal nomodifiable
-    
+    set ft=notes
+
     map <silent> <buffer> <CR> :call evervim#getNote()<CR>
 endfunction
 "}}}
@@ -63,7 +62,8 @@ function! evervim#notesByTag() " {{{
     setlocal modifiable
     python Evervimmer.getInstance().notesByTag()
     setlocal nomodifiable
-    
+    set ft=notesbytag
+
     map <silent> <buffer> <CR> :call evervim#getNote()<CR>
 endfunction
 "}}}
@@ -91,7 +91,7 @@ function! evervim#setBufAutocmdWhenWritePost() " {{{
     augroup END
 endfunction
 "}}}
-"}}}
+
 function! evervim#updateNote() " {{{
     python Evervimmer.getInstance().updateNote() 
 endfunction
@@ -103,6 +103,7 @@ function! evervim#notebookList() " {{{
     setlocal modifiable
     python Evervimmer.getInstance().listNotebooks()
     setlocal nomodifiable
+    set ft=notebooks
 
     map <silent> <buffer> <CR> :call evervim#notesByNotebook()<CR>
 endfunction
@@ -114,8 +115,43 @@ function! evervim#evervimSearchByQuery(word) " {{{
     setlocal modifiable
     python Evervimmer.getInstance().searchByQuery()
     setlocal nomodifiable
+    set ft=notesbyquery
 
     map <silent> <buffer> <CR> :call evervim#getNote()<CR>
+endfunction
+"}}}
+ 
+function! evervim#pageNext() " {{{
+    if &ft != 'notes' && &ft != 'notesbytag' && &ft != 'notesbyquery'
+        return
+    endif
+
+    setlocal modifiable
+    if &ft == 'notes'
+        python Evervimmer.getInstance().notesByNotebookNextpage()
+    elseif &ft == 'notesbytag'
+        python Evervimmer.getInstance().notesByTagNextpage()
+    elseif &ft == 'notesbyquery'
+        python Evervimmer.getInstance().searchByQueryNextpage()
+    endif
+    setlocal nomodifiable
+endfunction
+"}}}
+
+function! evervim#pagePrev() " {{{
+    if &ft != 'notes' && &ft != 'notesbytag' && &ft != 'notesbyquery'
+        return
+    endif
+
+    setlocal modifiable
+    if &ft == 'notes'
+        python Evervimmer.getInstance().notesByNotebookPrevpage()
+    elseif &ft == 'notesbytag'
+        python Evervimmer.getInstance().notesByTagPrevpage()
+    elseif &ft == 'notesbyquery'
+        python Evervimmer.getInstance().searchByQueryPrevpage()
+    endif
+    setlocal nomodifiable
 endfunction
 "}}}
 
@@ -159,9 +195,6 @@ function! evervim#createNoteBuf() " {{{
         call evervim#markdownBufSetup()
     endif
 
-    augroup evervimNote
-        autocmd!
-    augroup END
     augroup evervimCreate
         autocmd!
         autocmd BufWritePost <buffer> :call evervim#createNote()
@@ -175,6 +208,7 @@ function! evervim#listTags() " {{{
     setlocal modifiable
     python Evervimmer.getInstance().listTags()
     setlocal nomodifiable
+    set ft=taglists
 
     map <silent> <buffer> <CR> :call evervim#notesByTag()<CR>
 endfunction
@@ -194,6 +228,8 @@ function! evervim#listBufSetup() " {{{
         setlocal buftype=nofile
         setlocal nowrap
         setlocal nonumber
+        nmap <silent> <buffer> > :<C-u>EvervimPageNext<CR>
+        nmap <silent> <buffer> < :<C-u>EvervimPagePrev<CR>
     endif
 endfunction
 "}}}
@@ -214,7 +250,10 @@ function! evervim#noteBufSetup() " {{{
     if g:evervim_usemarkdown != '0'
         call evervim#markdownBufSetup()
     endif
-
+    " clear autosave. because when reuse buffer, autosaved(bug fix).
+    augroup evervimNote
+        autocmd!
+    augroup END
 endfunction
 "}}}
 
@@ -225,6 +264,31 @@ function! evervim#markdownBufSetup() " {{{
     hi link evervimTagBase Statement
     hi link evervimTagWord Type
 endfunction
+"}}}
+
+function! evervim#openBrowser() " {{{
+    if &ft == 'notes' || &ft == 'notesbytag' || &ft == 'notesbyquery'
+        python Evervimmer.getInstance().cursorNoteOpenBrowser()
+    else
+        python Evervimmer.getInstance().currentNoteOpenBrowser()
+    endif
+endfunction
+"}}}
+
+function! evervim#openClient() " {{{
+    if &ft == 'notes' || &ft == 'notesbytag' || &ft == 'notesbyquery'
+        python Evervimmer.getInstance().cursorNoteOpenClient()
+    else
+        python Evervimmer.getInstance().currentNoteOpenClient()
+    endif
+endfunction
+"}}}
+
+" add command {{{
+" Check OpenBrowser is installed that must be after plugin loaded, so check this.
+if exists(':OpenBrowser') == 2
+    command! EvervimOpenBrowser call evervim#openBrowser()
+endif
 "}}}
 
 python << EOF

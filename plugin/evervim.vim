@@ -1,8 +1,6 @@
 "=============================================================================
 " File: evervim.vim
 " Author: kakkyz <kakkyz81@gmail.com>
-" Last Change: 2011-05-05
-" Version: 0.1
 " WebPage: https://github.com/kakkyz81/evervim
 " License: MIT
 "
@@ -31,10 +29,6 @@ if !exists('g:evervim_password')
     let g:evervim_password = ''
 endif
 
-if !exists('g:evervim_sortnotes') " (updated|created|title) (asc|desc)
-    let g:evervim_sortnotes = 'updated desc'
-endif
-
 if !exists('g:evervim_sortnotebooks') " (name|serviceCreated|serviceUpdated) (asc|desc)
     let g:evervim_sortnotebooks = 'name asc'
 endif
@@ -55,6 +49,9 @@ if !exists('g:evervim_asyncupdate') "
     let g:evervim_asyncupdate = 1
 endif
 
+if !exists('g:evervim_enscriptpath') && (has('win32') || has('win64'))
+    let g:evervim_enscriptpath = '"C:\Program Files (x86)\Evernote\Evernote\ENScript.exe"'
+endif
 ""}}}
 
 " ---------------------------------------------------------------------------
@@ -66,6 +63,11 @@ function! s:setCommand() " {{{
     command! EvervimCreateNote call evervim#createNoteBuf()
     command! EvervimListTags call s:listTags()
     command! EvervimReloadPref call s:setPref()
+    command! EvervimPageNext call evervim#pageNext()
+    command! EvervimPagePrev call evervim#pagePrev()
+    if has('win32') || has('win64')
+        command! EvervimOpenClient call evervim#openClient()
+    endif
 endfunction
 "}}}
 
@@ -127,10 +129,6 @@ function! s:getNote() " {{{
 endfunction
 "}}}
 
-function! s:updateNote() " {{{
-    call evervim#updateNote()
-endfunction
-"}}}
 
 function! s:notebookList() " {{{
     call evervim#notebookList()

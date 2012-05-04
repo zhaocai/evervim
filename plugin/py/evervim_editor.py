@@ -19,13 +19,13 @@ class EvervimPref(object):
         self.workdir              = None
         self.username             = None
         self.password             = None
-        self.sortnotes            = None
         self.sortnotebooks        = None
         self.sorttags             = None
         self.xmlindent            = None
         self.usemarkdown          = None
         self.encoding             = None
         self.asyncupdate          = None
+        self.enscriptpath         = None
 
     @classmethod
     def getInstance(self):
