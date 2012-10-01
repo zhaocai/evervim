@@ -18,6 +18,7 @@
 #
 
 from TTransport import *
+import httpslib
 from cStringIO import StringIO
 
 import urlparse
@@ -54,6 +55,8 @@ class THttpClient(TTransportBase):
         self.port = parsed.port or httplib.HTTPS_PORT
       self.host = parsed.hostname
       self.path = parsed.path
+      if parsed.query:
+        self.path += '?%s' % parsed.query
     self.__wbuf = StringIO()
     self.__http = None
     self.__timeout = None
@@ -62,7 +65,10 @@ class THttpClient(TTransportBase):
     if self.scheme == 'http':
       self.__http = httplib.HTTP(self.host, self.port)
     else:
-      self.__http = httplib.HTTPS(self.host, self.port)
+      if False: # TODO: (XMM) workaround of ssl bug: https://bugs.launchpad.net/ubuntu/+source/openssl/+bug/965371
+        self.__http = httplib.HTTPS(self.host, self.port)
+      else:
+        self.__http = httpslib.HTTPS(self.host, self.port)
 
   def close(self):
     self.__http.close()
