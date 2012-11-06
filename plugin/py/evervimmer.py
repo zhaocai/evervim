@@ -250,7 +250,7 @@ class Evervimmer(object):
         try:
             note = Evervimmer.editor.api.getNote(guid)
         except Exception as e:
-            print e
+            vim.command('throw "%s"' % str(e) )
             return
         Evervimmer.currentnote = note
 
