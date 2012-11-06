@@ -242,7 +242,16 @@ class Evervimmer(object):
         currentline = int(vim.eval('l:pointer'))
         selectedNote = Evervimmer.notes[currentline - 2]
 
-        note = Evervimmer.editor.api.getNote(selectedNote)
+        self.getNoteByGuid(selectedNote.guid)
+
+    #}}}
+
+    def getNoteByGuid(self, guid):  # {{{
+        try:
+            note = Evervimmer.editor.api.getNote(guid)
+        except Exception as e:
+            print e
+            return
         Evervimmer.currentnote = note
 
         vim.current.buffer[:] = None  # clear buffer
