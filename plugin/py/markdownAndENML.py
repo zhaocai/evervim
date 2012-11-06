@@ -50,7 +50,7 @@ def parseENML(node, level=0, result='', option=parserOption()):  # {{{
             option.a = True
             htmltext = "".join([parseENML(child, level + 1, "", option) for child in node.childNodes])
             option.a = False
-            result += '[{0}]({1})'.format(htmltext, htmlhref)
+            result += u'[{0}]({1})'.format(htmltext, htmlhref)
             result += "\n"
         elif tag == "ul":
             option.ul = True
