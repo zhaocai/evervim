@@ -45,13 +45,13 @@ removefootercode = re.compile('</code>$')
 
 
 def parseENML(node, level=0, result='', option=parserOption()):  # {{{
-#   print node.toxml()
-#   print "{0}:{1}:{2}:{3}:{4}:{5}".format(
-#           level ,
-#           _getNodeType(node) ,
-#           _getTagName(node),
-#           _getAttribute(node),
-#           _getData(node), option)
+#    print node.toxml()
+#    print u"{0}:{1}:{2}:{3}:{4}:{5}".format(
+#          level ,
+#          _getNodeType(node) ,
+#          _getTagName(node),
+#          _getAttribute(node),
+#          _getData(node), option)
     if node.nodeType == node.ELEMENT_NODE:
         tag = _getTagName(node)
         if tag == "a":
@@ -131,6 +131,8 @@ def parseENML(node, level=0, result='', option=parserOption()):  # {{{
             result += ("#" * int(headerlv)) + " " + "".join([parseENML(
                 child, level + 1, "", option) for child in node.childNodes])
             option.header = False
+            result += "\n"
+        elif tag == "br":
             result += "\n"
         else:
             result += "".join([parseENML(child, level + 1,
