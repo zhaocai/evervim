@@ -177,7 +177,7 @@ class Evervimmer(object):
 
     def updateNoteInthread(self, note):  # {{{
         Evervimmer.editor.api.updateNote(note)
-        vim.command("echo 'evernote update successful.'")
+        vim.command("echohl MoreMsg | echomsg 'evernote update successful.' | echohl None")
     #}}}
 
     def updateNote(self):  # {{{
@@ -192,6 +192,7 @@ class Evervimmer(object):
             self.updatethread.start()
         else:
             Evervimmer.editor.api.updateNote(Evervimmer.currentnote)
+            vim.command("echo 'evernote update successful.'")
     #}}}
 
     def searchByQuery(self, query=None):  # {{{
@@ -242,7 +243,16 @@ class Evervimmer(object):
         currentline = int(vim.eval('l:pointer'))
         selectedNote = Evervimmer.notes[currentline - 2]
 
-        note = Evervimmer.editor.api.getNote(selectedNote)
+        self.getNoteByGuid(selectedNote.guid)
+
+    #}}}
+
+    def getNoteByGuid(self, guid):  # {{{
+        try:
+            note = Evervimmer.editor.api.getNote(guid)
+        except Exception as e:
+            vim.command('throw "%s"' % str(e) )
+            return
         Evervimmer.currentnote = note
 
         vim.current.buffer[:] = None  # clear buffer

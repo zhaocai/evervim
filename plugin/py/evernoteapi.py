@@ -6,7 +6,7 @@
 # {{{
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), 'lib/'))
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), 'lib/'))
 import time
 from datetime import datetime, timedelta
 
@@ -81,15 +81,15 @@ class EvernoteAPI(object):
         return note
     #}}}
 
-    def getNote(self, note):  # {{{
+    def getNote(self, guid):  # {{{
         """ return note include content and tagNames  """
         authToken = self.__getAuthToken()
-        returnNote = self.__getNoteStore().getNote(authToken, note.guid,
+        returnNote = self.__getNoteStore().getNote(authToken, guid,
                                                      withContent=True,
                                                      withResourcesData=False,
                                                      withResourcesRecognition=False,
                                                      withResourcesAlternateData=False)
-        returnNote.tagNames = self.__getNoteStore().getNoteTagNames(authToken, note.guid)
+        returnNote.tagNames = self.__getNoteStore().getNoteTagNames(authToken, guid)
         return returnNote
     #}}}
 

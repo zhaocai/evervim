@@ -19,7 +19,7 @@ except:
     raise StandardError("login error")
 EOF
 catch
-    echomsg 'login error! g:evervim_devtoken is correct???'
+    echomsg 'login error! is g:evervim_devtoken correct?'
     return '0'
 endtry
     return '1'
@@ -75,6 +75,20 @@ function! evervim#getNote() " {{{
     python Evervimmer.getInstance().getNote()
     exec 'silent! :w!'
     call evervim#setBufAutocmdWhenWritePost()
+endfunction
+"}}}
+function! evervim#getNoteByGuid(guid) " {{{
+    call evervim#noteBufSetup()
+
+    setlocal modifiable
+    try
+        python Evervimmer.getInstance().getNoteByGuid(vim.eval("a:guid"))
+        exec 'silent! :w!'
+        call evervim#setBufAutocmdWhenWritePost()
+    catch /^Vim\%((\a\+)\)\=:E605/
+        " execute "silent bdelete! " . bufnr('__EVERVIM_NOTE__')
+        echoerr v:exception
+    endtry
 endfunction
 "}}}
 
@@ -281,7 +295,7 @@ endfunction
 
 python << EOF
 import sys,os,vim
-sys.path.append(os.path.join(vim.eval('expand("<sfile>:p:h")'),'../plugin/py/'))
+sys.path.insert(1, os.path.join(vim.eval('expand("<sfile>:p:h")'),'../plugin/py/'))
 from evervimmer import Evervimmer
 EOF
 
