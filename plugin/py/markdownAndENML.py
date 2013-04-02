@@ -45,13 +45,15 @@ removefootercode = re.compile('</code>$')
 
 
 def parseENML(node, level=0, result='', option=parserOption()):  # {{{
-#    print node.toxml()
-#    print u"{0}:{1}:{2}:{3}:{4}:{5}".format(
-#          level ,
-#          _getNodeType(node) ,
-#          _getTagName(node),
-#          _getAttribute(node),
-#          _getData(node), option)
+# import html2text
+#   return html2text.html2text(node.toxml())
+#   print node.toxml()
+#   print u"{0}:{1}:{2}:{3}:{4}:{5}".format(
+#           level ,
+#           _getNodeType(node) ,
+#           _getTagName(node),
+#           _getAttribute(node),
+#           _getData(node), option)
     if node.nodeType == node.ELEMENT_NODE:
         tag = _getTagName(node)
         if tag == "a":
@@ -97,12 +99,16 @@ def parseENML(node, level=0, result='', option=parserOption()):  # {{{
             option.pre = False
         elif tag == "code":
             option.code = True
-            precode = removeheadercode.sub(
-                '', xml.sax.saxutils.unescape(node.toxml()))
-            precode = removefootercode.sub('', precode)
-            for line in precode.splitlines():
-                result += "    %s\n" % line.rstrip()
-            result += "\n"
+            if option.pre == True:
+                precode = removeheadercode.sub('', xml.sax.saxutils.unescape(node.toxml()))
+                precode = removefootercode.sub('', precode)
+                for line in precode.splitlines():
+                    result += "    %s\n" % line.rstrip()
+                result += "\n"
+            else:
+                incode = removeheadercode.sub('`', xml.sax.saxutils.unescape(node.toxml()))
+                incode = removefootercode.sub('`', incode)
+                result += incode
             option.code = False
         elif tag == "p":
             option.p = True
@@ -185,26 +191,16 @@ def _getAttribute(node):  # {{{
 
 def _getNodeType(node):  # {{{
     """ return NodeType as String """
-    if   node.nodeType == node.ELEMENT_NODE:
-        return   "ELEMENT_NODE"
-    elif node.nodeType == node.ATTRIBUTE_NODE:
-        return   "ATTRIBUTE_NODE"
-    elif node.nodeType == node.TEXT_NODE:
-        return   "TEXT_NODE"
-    elif node.nodeType == node.CDATA_SECTION_NODE:
-        return   "CDATA_SECTION_NODE"
-    elif node.nodeType == node.ENTITY_NODE:
-        return   "ENTITY_NODE"
-    elif node.nodeType == node.PROCESSING_INSTRUCTION_NODE:
-        return   "PROCESSING_INSTRUCTION_NODE"
-    elif node.nodeType == node.COMMENT_NODE:
-        return   "COMMENT_NODE"
-    elif node.nodeType == node.DOCUMENT_NODE:
-        return   "DOCUMENT_NODE"
-    elif node.nodeType == node.DOCUMENT_TYPE_NODE:
-        return   "DOCUMENT_TYPE_NODE"
-    elif node.nodeType == node.NOTATION_NODE:
-        return   "NOTATION_NODE"
+    if   node.nodeType == node.ELEMENT_NODE                    : return   "ELEMENT_NODE"
+    elif node.nodeType == node.ATTRIBUTE_NODE                  : return   "ATTRIBUTE_NODE"
+    elif node.nodeType == node.TEXT_NODE                       : return   "TEXT_NODE"
+    elif node.nodeType == node.CDATA_SECTION_NODE              : return   "CDATA_SECTION_NODE"
+    elif node.nodeType == node.ENTITY_NODE                     : return   "ENTITY_NODE"
+    elif node.nodeType == node.PROCESSING_INSTRUCTION_NODE     : return   "PROCESSING_INSTRUCTION_NODE"
+    elif node.nodeType == node.COMMENT_NODE                    : return   "COMMENT_NODE"
+    elif node.nodeType == node.DOCUMENT_NODE                   : return   "DOCUMENT_NODE"
+    elif node.nodeType == node.DOCUMENT_TYPE_NODE              : return   "DOCUMENT_TYPE_NODE"
+    elif node.nodeType == node.NOTATION_NODE                   : return   "NOTATION_NODE"
     return "UKNOWN NODE"
 #}}}
 

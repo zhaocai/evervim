@@ -42,7 +42,7 @@ if !exists('g:evervim_usemarkdown') "
 endif
 
 if !exists('g:evervim_asyncupdate') "
-    let g:evervim_asyncupdate = 1
+    let g:evervim_asyncupdate = 0
 endif
 
 if !exists('g:evervim_enscriptpath') && (has('win32') || has('win64'))
@@ -89,6 +89,12 @@ endfunction
 "}}}
 
 function! s:setup() " {{{
+    try
+        python import markdown
+    catch
+        echoerr ' *** import markdown error !!!!! you must markdown library. see :help evervim. *** '
+        finish
+    endtry
     echo 'login check...'
     if evervim#setup() == '1'
         call s:setCommand()
